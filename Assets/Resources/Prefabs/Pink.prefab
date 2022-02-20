@@ -339,5 +339,9 @@ PrefabInstance:
       propertyPath: selfsprt
       value: 
       objectReference: {fileID: 11400000, guid: 8a25ce2e6666a914a804201a50a9d603, type: 2}
+    - target: {fileID: 6589081285711151077, guid: d5751b9b312c56446bb9fb754278c17a, type: 3}
+      propertyPath: pieceType
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d5751b9b312c56446bb9fb754278c17a, type: 3}
