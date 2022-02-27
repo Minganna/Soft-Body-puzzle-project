@@ -4,35 +4,40 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    static GameManager instance;
+    public static GameManager instance;
     private Object[] Prefabs;
-    private int counter=0;
+    private int objcounter=0;
     private int maxPieces = 50;
     Vector2 prevObject;
+    List<GameObject> allObjects;
     List<GameObject> TouchedObjects;
+    List<string> nameToRemove;
     float speed = 0.1f;
+
     
     // Start is called before the first frame update
     void Start()
     {
         instance = this;
         TouchedObjects = new List<GameObject>();
-        Prefabs=Resources.LoadAll("Prefabs", typeof(GameObject));
+        allObjects= new List<GameObject>();
+        Prefabs =Resources.LoadAll("Prefabs", typeof(GameObject));
         generatePieces();
     }
 
     void generatePieces()
     {
         prevObject = new Vector2(0, 0);
-        while(counter<maxPieces)
+        while(objcounter < maxPieces)
         {
             int pieceType = Random.Range(0, Prefabs.Length);
             Vector2 initialPos = Random.insideUnitCircle*2;
             GameObject tmp = Instantiate(Prefabs[pieceType], initialPos, Quaternion.identity) as GameObject;
-            tmp.name += counter;
+            tmp.name += objcounter;
             tmp.GetComponent<puzzlepiece>().instatiateSelf();
+            allObjects.Add(tmp);
             prevObject = initialPos;
-            counter += 1;
+            objcounter += 1;
         }
 
     }
@@ -44,13 +49,16 @@ public class GameManager : MonoBehaviour
         //check if the left mouse has been pressed down this frame
         if (Input.GetMouseButtonDown(0))
         {
-            puzzlePiece= rayCastingObjects();
-            if(puzzlePiece != null)
+            puzzlePiece = rayCastingObjects();
+            puzzlePiece.GetComponent<puzzlepiece>().onSelected();
+            Color color = Color.cyan;
+            changeSingleSpriteColor(puzzlePiece, color);
+            if (puzzlePiece != null)
             {
                 TouchedObjects.Add(puzzlePiece);
-                Debug.Log(puzzlePiece.name);
             }
- 
+            color = Color.gray;
+            changeSpriteColor(puzzlePiece,color);
         }
         if (Input.GetMouseButton(0) && TouchedObjects.Count!=0)
         {
@@ -59,28 +67,80 @@ public class GameManager : MonoBehaviour
             {
                 if (puzzlePiece.GetComponent<puzzlepiece>().pieceType==TouchedObjects[TouchedObjects.Count-1].GetComponent<puzzlepiece>().pieceType)
                 {
-                    if(Vector2.Distance(puzzlePiece.transform.position, TouchedObjects[TouchedObjects.Count - 1].transform.position)<1.0f)
+                    puzzlePiece.GetComponent<puzzlepiece>().onSelected();
+                    if (Vector2.Distance(puzzlePiece.transform.position, TouchedObjects[TouchedObjects.Count - 1].transform.position)<1.2f)
                     {
-                        Debug.Log(puzzlePiece.name);
+                        Color color= Color.cyan;
+                        changeSingleSpriteColor(puzzlePiece,color);
                         TouchedObjects.Add(puzzlePiece);
                     }
 
                 }
             }  
-            if(TouchedObjects[TouchedObjects.Count - 1])
-            {
-                //TouchedObjects[TouchedObjects.Count - 1].transform.position = Vector3.Lerp(TouchedObjects[TouchedObjects.Count - 1].transform.position, getMousePos(), speed * Time.deltaTime);
-  
-            }
         }
         if(Input.GetMouseButtonUp(0))
         {
+            Color color = Color.white;
+            changeSpriteColor(TouchedObjects[TouchedObjects.Count - 1], color);
+            int counter = 0;
+            foreach(GameObject obj in TouchedObjects)
+            {
+                puzzlepiece pzp = obj.GetComponent<puzzlepiece>();
+                pzp.alreadyTouched = false;
+                counter++;
+                changeSpriteColor(obj, color);
+                if (TouchedObjects.Count>1)
+                {
+                    if (counter < TouchedObjects.Count)
+                    {
+                        allObjects.Remove(obj);
+                        Destroy(obj);
+                    }
+                    else
+                    {
+                        pzp.setScale(counter);
+                    }
+                }
+                else
+                {
+                    allObjects.Remove(obj);
+                    Destroy(obj);
+                }
+            }
             TouchedObjects.Clear();
-            Debug.Log(TouchedObjects.Count);
+            objcounter = 0;
+            foreach(GameObject objs in allObjects)
+            {
+                puzzlepiece tmp = objs.GetComponent<puzzlepiece>();
+                if(tmp.getSize()==0)
+                {
+                    objcounter++;
+                }
+                else
+                {
+                    objcounter += tmp.getSize();
+                }
+            }
+            generatePieces();
         }
+    }
 
+    private void changeSpriteColor(GameObject puzzlePiece, Color color)
+    {
+        foreach (GameObject piece in allObjects)
+        {
+            if (piece.GetComponent<puzzlepiece>().pieceType != puzzlePiece.GetComponent<puzzlepiece>().pieceType)
+            {
+                SpriteRenderer pzp = piece.GetComponent<SpriteRenderer>();
+                pzp.color = color;
+            }
+        }
+    }
 
-
+    private void changeSingleSpriteColor(GameObject puzzlePiece, Color color)
+    {
+                SpriteRenderer pzp = puzzlePiece.GetComponent<SpriteRenderer>();
+                pzp.color = color;
     }
 
     private static GameObject rayCastingObjects()
