@@ -11,11 +11,14 @@ public class puzzlepiece : MonoBehaviour
     float scalingFramesLeft=0;
     Transform center;
     public bool alreadyTouched;
+    LineRenderer lr;
 
     public type pieceType;
     // Start is called before the first frame update
     public void instatiateSelf()
     {
+        lr = this.GetComponent<LineRenderer>();
+        deactivateLineRender();
         center = this.transform.GetChild(8);
         selfsprt.setThisOBJ(this.gameObject);
         selfsprt.setSprite();
@@ -60,6 +63,27 @@ public class puzzlepiece : MonoBehaviour
     public int getSize()
     {
         return (int)scalesUp;
+    }
+
+
+    public void connectToPrevious(Transform otherPos)
+    {
+        Color color = Color.white;
+        lr.material = new Material(Shader.Find("Sprites/Default"));
+        lr.enabled = true;
+        lr.startColor=color;
+        lr.endColor = color;
+        lr.startWidth = 0.2f;
+        lr.endWidth = 0.2f;
+        lr.SetPosition(0, this.transform.position);
+        lr.SetPosition(1, otherPos.position);
+    }
+
+    public void deactivateLineRender()
+    {
+        lr.SetPosition(0, this.transform.position);
+        lr.SetPosition(1, this.transform.position);
+        lr.enabled = false;
     }
 
 }

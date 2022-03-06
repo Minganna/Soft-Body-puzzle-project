@@ -10,5 +10,6 @@ public class BonePos : MonoBehaviour
     {
         startPos = this.transform.localPosition;
         startRot = this.transform.rotation;
+
     }
 }

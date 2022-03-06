@@ -50,28 +50,30 @@ public class GameManager : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             puzzlePiece = rayCastingObjects();
-            puzzlePiece.GetComponent<puzzlepiece>().onSelected();
-            Color color = Color.cyan;
-            changeSingleSpriteColor(puzzlePiece, color);
+          
             if (puzzlePiece != null)
             {
+                puzzlePiece.GetComponent<puzzlepiece>().onSelected();
                 TouchedObjects.Add(puzzlePiece);
+                Color color = Color.gray;
+                changeSpriteColor(puzzlePiece, color);
             }
-            color = Color.gray;
-            changeSpriteColor(puzzlePiece,color);
+
         }
         if (Input.GetMouseButton(0) && TouchedObjects.Count!=0)
         {
             puzzlePiece=rayCastingObjects();
             if (puzzlePiece!=null && !TouchedObjects.Contains(puzzlePiece))
             {
-                if (puzzlePiece.GetComponent<puzzlepiece>().pieceType==TouchedObjects[TouchedObjects.Count-1].GetComponent<puzzlepiece>().pieceType)
+                puzzlepiece pp = puzzlePiece.GetComponent<puzzlepiece>();
+                GameObject previousOBJ = TouchedObjects[TouchedObjects.Count - 1];
+                puzzlepiece previousPp = previousOBJ.GetComponent<puzzlepiece>();
+                if (pp.pieceType== previousPp.pieceType)
                 {
-                    puzzlePiece.GetComponent<puzzlepiece>().onSelected();
-                    if (Vector2.Distance(puzzlePiece.transform.position, TouchedObjects[TouchedObjects.Count - 1].transform.position)<1.2f)
+                    pp.onSelected();
+                    if (Vector2.Distance(puzzlePiece.transform.position, previousOBJ.transform.position)< (pp.getSize()+previousPp.getSize())+1.2f)
                     {
-                        Color color= Color.cyan;
-                        changeSingleSpriteColor(puzzlePiece,color);
+                        pp.connectToPrevious(previousOBJ.transform);
                         TouchedObjects.Add(puzzlePiece);
                     }
 
@@ -81,7 +83,11 @@ public class GameManager : MonoBehaviour
         if(Input.GetMouseButtonUp(0))
         {
             Color color = Color.white;
-            changeSpriteColor(TouchedObjects[TouchedObjects.Count - 1], color);
+            if (TouchedObjects.Count>0)
+            {
+                changeSpriteColor(TouchedObjects[TouchedObjects.Count - 1], color);
+            }
+
             int counter = 0;
             foreach(GameObject obj in TouchedObjects)
             {
@@ -99,6 +105,8 @@ public class GameManager : MonoBehaviour
                     else
                     {
                         pzp.setScale(counter);
+                        pzp.deactivateLineRender();
+                        pzp.onSelected();
                     }
                 }
                 else
@@ -135,12 +143,6 @@ public class GameManager : MonoBehaviour
                 pzp.color = color;
             }
         }
-    }
-
-    private void changeSingleSpriteColor(GameObject puzzlePiece, Color color)
-    {
-                SpriteRenderer pzp = puzzlePiece.GetComponent<SpriteRenderer>();
-                pzp.color = color;
     }
 
     private static GameObject rayCastingObjects()
