@@ -7,8 +7,6 @@ public class puzzlepiece : MonoBehaviour
 {
     public sprites selfsprt;
     float GameRadious = 1;
-    float scalesUp = 0;
-    float scalingFramesLeft=0;
     Transform center;
     public bool alreadyTouched;
     LineRenderer lr;
@@ -22,16 +20,6 @@ public class puzzlepiece : MonoBehaviour
         center = this.transform.GetChild(8);
         selfsprt.setThisOBJ(this.gameObject);
         selfsprt.setSprite();
-    }
-
-    private void Update()
-    {
-        if(scalingFramesLeft > 0)
-        {
-            transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(transform.localScale.x+scalesUp, transform.localScale.y + scalesUp, transform.localScale.z + scalesUp) , Time.deltaTime);
-            scalingFramesLeft--;
-        }
-
     }
 
     public void onSelected()
@@ -48,22 +36,11 @@ public class puzzlepiece : MonoBehaviour
         alreadyTouched = true;
     }
 
-
-    public void setScale(int counter)
-    {
-        scalesUp += counter;
-        scalingFramesLeft = counter;
-    }
-
     public Transform getCenter()
     {
         return center;
     }
     
-    public int getSize()
-    {
-        return (int)scalesUp;
-    }
 
 
     public void connectToPrevious(Transform otherPos)
@@ -84,6 +61,11 @@ public class puzzlepiece : MonoBehaviour
         lr.SetPosition(0, this.transform.position);
         lr.SetPosition(1, this.transform.position);
         lr.enabled = false;
+    }
+
+    public Sprite GetSprite()
+    {
+        return selfsprt.GetSprite();
     }
 
 }

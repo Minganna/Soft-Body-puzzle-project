@@ -28,4 +28,9 @@ public class sprites : ScriptableObject
     {
         spriteSelected = selected;
     }
+
+    public Sprite GetSprite()
+    {
+        return puzzleSprites[spriteSelected];
+    }
 }

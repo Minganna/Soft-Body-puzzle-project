@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,23 +12,54 @@ public class GameManager : MonoBehaviour
     Vector2 prevObject;
     List<GameObject> allObjects;
     List<GameObject> TouchedObjects;
+    List<Image> UIsprites;
     List<string> nameToRemove;
     float speed = 0.1f;
+    enemyLogic el;
 
     
     // Start is called before the first frame update
     void Start()
-    {
+    {  
         instance = this;
         TouchedObjects = new List<GameObject>();
         allObjects= new List<GameObject>();
-        Prefabs =Resources.LoadAll("Prefabs", typeof(GameObject));
+        Prefabs =Resources.LoadAll("Prefabs/PuzzlePieces", typeof(GameObject));
+        UIsprites = new List<Image>();
+        GameObject[] tmpUI= GameObject.FindGameObjectsWithTag("UISprites");
+        foreach(GameObject ui in tmpUI)
+        {
+            UIsprites.Add(ui.GetComponent<Image>());
+        }
         generatePieces();
+        getIcons();
+        el = enemyLogic.instance;
     }
+
+    void getIcons()
+    {
+        int spritesCount = 0;
+        List<Sprite> sprites = new List<Sprite>();
+        foreach (GameObject pp in allObjects)
+        {
+            puzzlepiece tmpPuzzlepiece = pp.GetComponent<puzzlepiece>();
+            if (!sprites.Contains(tmpPuzzlepiece.GetSprite()))
+            {
+                if (spritesCount < UIsprites.Count)
+                {
+                    sprites.Add(tmpPuzzlepiece.GetSprite());
+                    UIsprites[spritesCount].sprite = sprites[spritesCount];
+                    spritesCount++;
+                }
+            }
+        }
+    }
+
 
     void generatePieces()
     {
         prevObject = new Vector2(0, 0);
+
         while(objcounter < maxPieces)
         {
             int pieceType = Random.Range(0, Prefabs.Length);
@@ -71,7 +103,7 @@ public class GameManager : MonoBehaviour
                 if (pp.pieceType== previousPp.pieceType)
                 {
                     pp.onSelected();
-                    if (Vector2.Distance(puzzlePiece.transform.position, previousOBJ.transform.position)< (pp.getSize()+previousPp.getSize())+1.2f)
+                    if (Vector2.Distance(puzzlePiece.transform.position, previousOBJ.transform.position)<1.2f)
                     {
                         pp.connectToPrevious(previousOBJ.transform);
                         TouchedObjects.Add(puzzlePiece);
@@ -97,17 +129,11 @@ public class GameManager : MonoBehaviour
                 changeSpriteColor(obj, color);
                 if (TouchedObjects.Count>1)
                 {
-                    if (counter < TouchedObjects.Count)
-                    {
-                        allObjects.Remove(obj);
-                        Destroy(obj);
-                    }
-                    else
-                    {
-                        pzp.setScale(counter);
-                        pzp.deactivateLineRender();
-                        pzp.onSelected();
-                    }
+                    pzp.deactivateLineRender();
+                    pzp.onSelected(); 
+                    counter++;
+                    allObjects.Remove(obj);
+                    Destroy(obj);
                 }
                 else
                 {
@@ -115,20 +141,10 @@ public class GameManager : MonoBehaviour
                     Destroy(obj);
                 }
             }
+            el.ChangeText(counter);
             TouchedObjects.Clear();
-            objcounter = 0;
-            foreach(GameObject objs in allObjects)
-            {
-                puzzlepiece tmp = objs.GetComponent<puzzlepiece>();
-                if(tmp.getSize()==0)
-                {
-                    objcounter++;
-                }
-                else
-                {
-                    objcounter += tmp.getSize();
-                }
-            }
+            objcounter = allObjects.Count;
+
             generatePieces();
         }
     }
@@ -168,6 +184,12 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
+
+    public void takeDamage(int damage)
+    {
+        maxPieces -= damage;
+        
+    }
     private static Vector3 getMousePos()
     {
         Vector3 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);

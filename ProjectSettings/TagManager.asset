@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - UISprites
   layers:
   - Default
   - TransparentFX
@@ -49,4 +50,7 @@ TagManager:
     locked: 0
   - name: PuzzlePieces
     uniqueID: 451305113
+    locked: 0
+  - name: UICanvas
+    uniqueID: 2386592385
     locked: 0
