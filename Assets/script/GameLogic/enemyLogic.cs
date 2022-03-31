@@ -11,6 +11,9 @@ public class enemyLogic : MonoBehaviour
     int countersize = 0;
     float timer = 0;
     bool attack=true;
+    List<string> puzzlesType;
+
+    GameManager gm;
 
     int AttackTimer = 5;
 
@@ -20,6 +23,7 @@ public class enemyLogic : MonoBehaviour
     {
         ChangeText(0);
         enemies.setEnemyStage(gameObject.name);
+        puzzlesType = new List<string>();
         instance = this;
     }
 
@@ -34,7 +38,7 @@ public class enemyLogic : MonoBehaviour
             if(attack)
             {
                 attack = false;
-                Debug.Log(seconds);
+                gm.takeDamage();
             }
         }
         else
@@ -49,5 +53,20 @@ public class enemyLogic : MonoBehaviour
     {
         countersize += size;
         CurrentSize.text = "Current size: " + countersize;
+    }
+
+
+    public void setPuzzles(string name)
+    {
+        puzzlesType.Add(name);
+    }
+
+    public void addBonus()
+    {
+        gm = GameManager.instance;
+        if(puzzlesType.Contains(enemies.getBType().ToLower()))
+        {
+            AttackTimer *= 2;
+        }
     }
 }

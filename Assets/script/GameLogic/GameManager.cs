@@ -32,8 +32,8 @@ public class GameManager : MonoBehaviour
             UIsprites.Add(ui.GetComponent<Image>());
         }
         generatePieces();
-        getIcons();
         el = enemyLogic.instance;
+        getIcons();
     }
 
     void getIcons()
@@ -49,10 +49,12 @@ public class GameManager : MonoBehaviour
                 {
                     sprites.Add(tmpPuzzlepiece.GetSprite());
                     UIsprites[spritesCount].sprite = sprites[spritesCount];
+                    el.setPuzzles(tmpPuzzlepiece.GetSprite().name.ToLower());
                     spritesCount++;
                 }
             }
         }
+        el.addBonus();
     }
 
 
@@ -185,11 +187,18 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public void takeDamage(int damage)
+    public void takeDamage()
     {
-        maxPieces -= damage;
-        
+        maxPieces--;
+        int puzzleToRemove = Random.Range(0, allObjects.Count-1);
+        if (!TouchedObjects.Contains(allObjects[puzzleToRemove]))
+        {
+            GameObject tmp = allObjects[puzzleToRemove];
+            allObjects.Remove(tmp);
+            Destroy(tmp);
+        }
     }
+
     private static Vector3 getMousePos()
     {
         Vector3 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);

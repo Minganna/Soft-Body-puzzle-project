@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a556aa9c7ffc67043bd2690718826633, type: 3}
   m_Name: crab
   m_EditorClassIdentifier: 
+  getBonus: 2
   enemySprites: []

@@ -4,11 +4,14 @@ using UnityEngine;
 
 
 public enum enemyType { Crab,None}
+public enum bonusType { axolotl, frog, whale,octopus }
 
 
 [CreateAssetMenu(fileName = "EnemyType", menuName = "Enemy Type", order = 51)]
 public class Enemies : ScriptableObject
 {
+    [SerializeField]
+    bonusType getBonus;
     [SerializeField]
     List<Sprite> enemySprites;
     GameObject thisOBJ;
@@ -21,6 +24,7 @@ public class Enemies : ScriptableObject
         {
             en = (enemyType)System.Enum.Parse(typeof(enemyType), stage);
             Debug.Log(en);
+            Debug.Log(getBonus.ToString());
         }
         catch
         {
@@ -29,4 +33,10 @@ public class Enemies : ScriptableObject
         }
 
     }
+
+    public string getBType()
+    {
+        return getBonus.ToString();
+    }
+
 }

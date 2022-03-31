@@ -33,4 +33,5 @@ public class sprites : ScriptableObject
     {
         return puzzleSprites[spriteSelected];
     }
+
 }
